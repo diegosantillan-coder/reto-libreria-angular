@@ -1,0 +1,49 @@
+{
+  "name": "@validator-lib/core",
+  "version": "1.0.0",
+  "description": "Angular library for real-time data validation with idempotency support",
+  "keywords": [
+    "angular",
+    "validation",
+    "idempotency",
+    "library"
+  ],
+  "author": "Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/internal/validator-lib"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=18.0.0 <21.0.0",
+    "@angular/common": ">=18.0.0 <21.0.0",
+    "rxjs": ">=7.0.0 <8.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "sideEffects": false,
+  "module": "fesm2022/validator-lib-core.mjs",
+  "es2022": "fesm2022/validator-lib.mjs",
+  "fesm2022": "fesm2022/validator-lib.mjs",
+  "typings": "index.d.ts",
+  "exports": {
+    ".": {
+      "default": "./fesm2022/validator-lib-core.mjs",
+      "types": "./index.d.ts"
+    },
+    "./package.json": {
+      "default": "./package.json"
+    }
+  },
+  "scripts": {
+    "prepublishOnly": "node --eval \"console.error('ERROR: Trying to publish a package that has been compiled in full compilation mode. This is not allowed.\\nPlease delete and rebuild the package with partial compilation mode, before attempting to publish.\\n')\" && exit 1"
+  }
+}

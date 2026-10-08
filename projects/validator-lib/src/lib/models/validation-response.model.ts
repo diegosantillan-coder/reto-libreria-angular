@@ -8,7 +8,13 @@ export type ValidationStatus =
   | 'SUCCESS'
   | 'FAILED'
   | 'INVALID'
-  | 'TIMEOUT';
+  | 'TIMEOUT'
+  | 'pending'
+  | 'success'
+  | 'failed'
+  | 'invalid'
+  | 'timeout'
+  | 'error';
 
 /**
  * Modelo que representa una respuesta de validación.
@@ -48,6 +54,11 @@ export interface ValidationResponse<T = unknown> {
    * Duración de la validación en milisegundos.
    */
   durationMs: number;
+
+  /**
+   * Metadatos adicionales generados por las capas de servicio o engine.
+   */
+  metadata?: Record<string, unknown>;
 }
 
 /**

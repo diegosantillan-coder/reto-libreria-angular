@@ -21,6 +21,9 @@ export * from './lib/utilities/idempotency-key-generator';
 export * from './lib/utilities/error-handler';
 export * from './lib/utilities/performance-monitor';
 
+import type { ValidationRequest, ExtractDataType } from './lib/models/validation-request.model';
+import type { ValidationResponse, ValidationStatus, ValidationError } from './lib/models/validation-response.model';
+
 // Public core engine
 export * from './lib/core/validation-engine';
 
@@ -31,8 +34,8 @@ export { ThirdPartyAdapterService } from './lib/services/third-party-adapter.ser
 
 // Re-export utilities
 export { IdempotencyKeyGenerator } from './lib/utilities/idempotency-key-generator';
-export { ErrorHandler } from './lib/utilities/error-handler';
-export { PerformanceMonitor } from './lib/utilities/performance-monitor';
+export { ErrorHandlerService as ErrorHandler } from './lib/utilities/error-handler';
+export { PerformanceMonitorService as PerformanceMonitor } from './lib/utilities/performance-monitor';
 
 // Re-export models
 export type { ValidationRequest, ExtractDataType } from './lib/models/validation-request.model';

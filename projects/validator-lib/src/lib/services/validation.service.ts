@@ -4,7 +4,8 @@ import { map, switchMap, takeUntil, tap, catchError, shareReplay, distinctUntilC
 import { ValidationEngine } from '../core/validation-engine';
 import { ThirdPartyAdapterService } from './third-party-adapter.service';
 import { IdempotencyKeyGenerator } from '../utilities/idempotency-key-generator';
-import { ValidationRequest, ValidationResponse, ValidationStatus } from '../models/validation.models';
+import { ValidationRequest } from '../models/validation-request.model';
+import { ValidationResponse, ValidationStatus } from '../models/validation-response.model';
 
 export interface ValidationMetrics {
   totalRequests: number;
@@ -79,8 +80,11 @@ export class ValidationService implements OnDestroy {
     return validation$.pipe(
       tap(response => {
         if (response.status === 'success') {
-          this.updateMetrics(false, response.metadata?.latency);
-          
+          const latency = typeof response.metadata?.['latency'] === 'number'
+            ? response.metadata['latency'] as number
+            : undefined;
+          this.updateMetrics(false, latency);
+
           if (finalOptions.useCache) {
             const idempotencyKey = this.idempotencyGenerator.generateKey(request);
             this.validationEngine.cacheResponse(
@@ -215,10 +219,12 @@ export class ValidationService implements OnDestroy {
     data: Record<string, unknown>
   ): ValidationResponse {
     return {
+      requestId: request.requestId || this.generateRequestId(),
+      idempotencyKey: request.idempotencyKey || this.idempotencyGenerator.generateKey(request),
       status: 'success',
       data: data as unknown,
-      requestId: this.generateRequestId(),
-      timestamp: new Date().toISOString(),
+      timestamp: Date.now(),
+      durationMs: 0,
       metadata: {
         processingTime: 0,
         cached: false
@@ -229,18 +235,21 @@ export class ValidationService implements OnDestroy {
   private createErrorResponse(error: unknown): ValidationResponse {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     const errorCode = error && typeof error === 'object' && 'code' in error 
-      ? String((error as Record<string, unknown>).code) 
+      ? String((error as Record<string, unknown>)['code']) 
       : 'VALIDATION_ERROR';
     
     return {
+      requestId: this.generateRequestId(),
+      idempotencyKey: `error-${Date.now()}`,
       status: 'error',
       error: {
         code: errorCode,
         message: errorMessage,
-        details: { timestamp: new Date().toISOString() }
+        details: { timestamp: new Date().toISOString() },
+        recoverable: false
       },
-      requestId: this.generateRequestId(),
-      timestamp: new Date().toISOString()
+      timestamp: Date.now(),
+      durationMs: 0
     };
   }
 

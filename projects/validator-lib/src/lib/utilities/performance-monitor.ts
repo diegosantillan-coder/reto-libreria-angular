@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, Optional } from '@angular/core';
+import { Injectable, OnDestroy, Optional, Inject, InjectionToken } from '@angular/core';
 import { BehaviorSubject, Observable, interval, Subscription } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
@@ -34,6 +34,10 @@ export interface PerformanceAlert {
   timestamp: Date;
 }
 
+export const PERFORMANCE_THRESHOLDS = new InjectionToken<PerformanceThresholds>('PERFORMANCE_THRESHOLDS');
+export const PERFORMANCE_WINDOW_SIZE = new InjectionToken<number>('PERFORMANCE_WINDOW_SIZE');
+export const PERFORMANCE_MAX_LATENCY_RECORDS = new InjectionToken<number>('PERFORMANCE_MAX_LATENCY_RECORDS');
+
 @Injectable({
   providedIn: 'root'
 })
@@ -59,13 +63,13 @@ export class PerformanceMonitorService implements OnDestroy {
   private maxLatencyRecords: number;
 
   constructor(
-    @Optional() thresholds?: PerformanceThresholds,
-    private windowSizeMsConfig: number = 60000,
-    private maxLatencyRecordsConfig: number = 10000
+    @Optional() @Inject(PERFORMANCE_THRESHOLDS) thresholds?: PerformanceThresholds,
+    @Optional() @Inject(PERFORMANCE_WINDOW_SIZE) private windowSizeMsConfig: number | null = null,
+    @Optional() @Inject(PERFORMANCE_MAX_LATENCY_RECORDS) private maxLatencyRecordsConfig: number | null = null
   ) {
     this.thresholds = { ...this.defaultThresholds, ...thresholds };
-    this.windowSizeMs = windowSizeMsConfig;
-    this.maxLatencyRecords = maxLatencyRecordsConfig;
+    this.windowSizeMs = this.windowSizeMsConfig ?? 60000;
+    this.maxLatencyRecords = this.maxLatencyRecordsConfig ?? 10000;
   }
 
   startMonitoring(intervalMs: number = 1000): void {

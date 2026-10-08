@@ -29,15 +29,12 @@ export class ValidationEngine {
    * @returns Observable con la respuesta de validación.
    */
   validate<T = unknown>(request: ValidationRequest): Observable<ValidationResponse<T>> {
-    // Validar estructura de la solicitud
-    if (!request.ttl) {
-      request.ttl = this.defaultTtl;
-    }
+    const ttl = request.ttl ?? this.defaultTtl;
+    request.ttl = ttl;
 
-    // Verificar caché primero
     const cachedResponse = this.getCachedResponse(request.idempotencyKey);
     if (cachedResponse) {
-      return of(cachedResponse);
+      return of(cachedResponse as ValidationResponse<T>);
     }
 
     // Verificar si hay una solicitud en vuelo con la misma clave de idempotencia
@@ -51,7 +48,7 @@ export class ValidationEngine {
     const request$ = this.processRequest(request).pipe(
       tap(response => {
         const durationMs = Date.now() - startTime;
-        this.cacheResponse(request.idempotencyKey, response, request.ttl);
+        this.cacheResponse(request.idempotencyKey, response, request.ttl ?? this.defaultTtl);
         this.inFlightRequests.delete(request.idempotencyKey);
       }),
       catchError(error => {
@@ -61,7 +58,7 @@ export class ValidationEngine {
     );
 
     this.inFlightRequests.set(request.idempotencyKey, request$);
-    return request$;
+    return request$ as Observable<ValidationResponse<T>>;
   }
 
   /**
@@ -122,7 +119,7 @@ export class ValidationEngine {
         ));
       case 'phone':
         const phone = request.data as string;
-        const phoneValid = /^+?[0-9]{10,15}$/.test(phone);
+        const phoneValid = /^\+?[0-9]{10,15}$/.test(phone);
         return of(createSuccessResponse<T>(
           request,
           { valid: phoneValid, value: phone } as unknown as T,
@@ -143,7 +140,7 @@ export class ValidationEngine {
    * @param idempotencyKey Clave de idempotencia.
    * @returns Respuesta en caché o undefined.
    */
-  private getCachedResponse(idempotencyKey: string): ValidationResponse | undefined {
+  getCachedResponse(idempotencyKey: string): ValidationResponse | undefined {
     const cached = this.cache.get(idempotencyKey);
     if (cached && cached.expiresAt > Date.now()) {
       return cached.response;
@@ -158,11 +155,12 @@ export class ValidationEngine {
    * @param response Respuesta a cachear.
    * @param ttl Tiempo de vida en milisegundos.
    */
-  private cacheResponse(idempotencyKey: string, response: ValidationResponse, ttl: number): void {
-    // Limpiar caché si supera el tamaño máximo
+  cacheResponse(idempotencyKey: string, response: ValidationResponse, ttl: number): void {
     if (this.cache.size >= this.maxCacheSize) {
       const oldestKey = this.cache.keys().next().value;
-      this.cache.delete(oldestKey);
+      if (oldestKey !== undefined) {
+        this.cache.delete(oldestKey);
+      }
     }
 
     this.cache.set(idempotencyKey, {

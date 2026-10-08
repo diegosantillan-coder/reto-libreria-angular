@@ -21,6 +21,16 @@ export interface ValidationRequest {
   validationType: string;
 
   /**
+   * Compatibilidad con código legado que usa un campo `type`.
+   */
+  type?: string;
+
+  /**
+   * Compatibilidad con código legado que usa `context`.
+   */
+  context?: Record<string, unknown>;
+
+  /**
    * Clave de idempotencia generada a partir de los parámetros de entrada.
    * Garantiza que solicitudes idénticas produzcan el mismo resultado.
    */

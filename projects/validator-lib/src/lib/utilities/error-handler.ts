@@ -1,4 +1,4 @@
-import { Injectable, Optional, inject } from '@angular/core';
+import { Injectable, Optional, Inject, InjectionToken } from '@angular/core';
 import { Observable, throwError, timer, BehaviorSubject, Subject } from 'rxjs';
 import { catchError, retry, retryWhen, delayWhen, take, tap, switchMap } from 'rxjs/operators';
 import { ValidationResponse } from '../models/validation-response.model';
@@ -39,6 +39,8 @@ export interface ErrorEvent {
   strategy: string;
 }
 
+export const ERROR_HANDLER_CONFIG = new InjectionToken<ErrorHandlerConfig>('ERROR_HANDLER_CONFIG');
+
 @Injectable({
   providedIn: 'root'
 })
@@ -65,7 +67,7 @@ export class ErrorHandlerService {
   private errorEvents = new Subject<ErrorEvent>();
   private config: ErrorHandlerConfig;
 
-  constructor(@Optional() config?: ErrorHandlerConfig) {
+  constructor(@Optional() @Inject(ERROR_HANDLER_CONFIG) config?: ErrorHandlerConfig) {
     this.config = config || {};
   }
 
@@ -158,7 +160,7 @@ export class ErrorHandlerService {
         this.log('All retry attempts exhausted');
         return this.executeFallbackStrategies(err, originalRequest, fallbackStrategies as FallbackStrategy<unknown>[]);
       })
-    );
+    ) as Observable<T>;
   }
 
   private executeFallbackStrategies<T>(

@@ -2,7 +2,8 @@ import { Injectable, Inject, Optional } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, timer, Subject, of } from 'rxjs';
 import { catchError, retry, map, switchMap, takeUntil, finalize, share, timeout } from 'rxjs/operators';
-import { ValidationRequest, ValidationResponse, ValidationError } from '../models/validation.models';
+import { ValidationRequest } from '../models/validation-request.model';
+import { ValidationResponse, ValidationError } from '../models/validation-response.model';
 
 export interface ThirdPartyConfig {
   baseUrl: string;
@@ -168,18 +169,18 @@ export class ThirdPartyAdapterService {
     const retryDelay = this.config.retryDelay || this.DEFAULT_RETRY_DELAY;
     
     return timer(0).pipe(
-      switchMap(() => 
+      switchMap(() =>
         this.http.post<ValidationResponse<T>>(
           `${this.config.baseUrl}/validate`,
           request,
           { headers }
         ).pipe(
           timeout(timeoutMs),
-          catchError(error => this.handleError(error, maxRetries, retryDelay, request, headers))
+          catchError(error => this.handleError<T>(error, maxRetries, retryDelay, request, headers))
         )
       ),
       takeUntil(this.destroy$)
-    );
+    ) as Observable<ValidationResponse<T>>;
   }
 
   private handleError<T>(
@@ -206,7 +207,8 @@ export class ThirdPartyAdapterService {
         status: error.status,
         url: error.url,
         timestamp: new Date().toISOString()
-      }
+      },
+      recoverable: this.isRetryableError(error)
     };
     
     return throwError(() => validationError);

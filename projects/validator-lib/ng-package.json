@@ -3,24 +3,11 @@
   "dest": "../../dist/validator-lib",
   "lib": {
     "entryFile": "src/public-api.ts",
-    "umdModuleIds": {
-      "rxjs": "rxjs",
-      "rxjs/operators": "rxjs.operators"
-    },
     "styleIncludePaths": []
   },
-  "whitelistedNonPeerDependencies": [
-    "tslib"
-  ],
   "assets": [],
   "inlineStyleLanguage": "scss",
-  "skipTypeValidation": false,
-  "compilationMode": "full",
-  "secondaryEntrypoints": [],
   "allowedNonPeerDependencies": [
     "tslib"
-  ],
-  "generatePackageJson": true,
-  "updateEntryPointIds": true,
-  "tsConfig": "./tsconfig.lib.json"
+  ]
 }
