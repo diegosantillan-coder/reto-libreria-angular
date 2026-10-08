@@ -103,7 +103,7 @@
       "prefix": "lib",
       "architect": {
         "build": {
-          "builder": "ng-packagr:build",
+          "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
             "project": "projects/validator-lib/ng-package.json",
             "tsConfig": "projects/validator-lib/tsconfig.lib.json"

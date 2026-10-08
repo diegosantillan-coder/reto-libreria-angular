@@ -1,0 +1,43 @@
+{
+  "name": "reto-libreria-angular",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "ng": "ng",
+    "build": "ng build validator-lib",
+    "build:app": "ng build validator-app",
+    "serve": "ng serve validator-app",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@angular/animations": "20.2.0",
+    "@angular/common": "20.2.0",
+    "@angular/compiler": "20.2.0",
+    "@angular/core": "20.2.0",
+    "@angular/platform-browser": "20.2.0",
+    "@angular/platform-browser-dynamic": "20.2.0",
+    "@angular/router": "20.2.0",
+    "rxjs": "7.8.0",
+    "tslib": "^2.6.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^20.2.0",
+    "@angular/cli": "20.2.0",
+    "@angular/compiler-cli": "20.2.0",
+    "@types/node": "^20.11.0",
+    "ng-packagr": "^20.2.0",
+    "typescript": "~5.8.3",
+    "vitest": "1.4.0"
+  },
+  "overrides": {
+    "@angular/compiler": "20.2.0",
+    "@angular/compiler-cli": "20.2.0",
+    "@angular/core": "20.2.0",
+    "@angular/common": "20.2.0",
+    "@angular/platform-browser": "20.2.0",
+    "@angular/platform-browser-dynamic": "20.2.0",
+    "@angular/router": "20.2.0"
+  }
+}
